@@ -1,22 +1,28 @@
-import { TaskEntity } from './task.entity';
+import { Task } from './task.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDTO } from './dto/create-task-dto';
 import { TaskStatus } from './task.model';
 import { GetTasksFitlerDTO } from './dto/get-tasks-filter.dto';
+import { User } from 'src/auth/user.entity';
 
-@EntityRepository(TaskEntity)
-export class TaskRepository extends Repository<TaskEntity> {
-  async createTask(createTaskDTO: CreateTaskDTO): Promise<TaskEntity> {
-    const task = new TaskEntity();
+@EntityRepository(Task)
+export class TaskRepository extends Repository<Task> {
+  async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<Task> {
+    const task = new Task();
     task.title = createTaskDTO.title;
     task.description = createTaskDTO.description;
     task.status = TaskStatus.OPEN;
+    task.user = user;
     await task.save();
+    delete task.user;
 
     return task;
   }
 
-  async getTasks(getTasksFilterDTO: GetTasksFitlerDTO): Promise<TaskEntity[]> {
+  async getTasks(
+    getTasksFilterDTO: GetTasksFitlerDTO,
+    user: User,
+  ): Promise<Task[]> {
     const { status, search } = getTasksFilterDTO;
 
     const query = this.createQueryBuilder('task');
@@ -33,6 +39,8 @@ export class TaskRepository extends Repository<TaskEntity> {
         },
       );
     }
+
+    query.andWhere('task.userId = :userId', { userId: user.id });
 
     const tasks = await query.getMany();
     return tasks;
