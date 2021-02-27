@@ -5,12 +5,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
-} from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { Task } from 'src/tasks/task.entity';
+} from "typeorm";
+import * as bcrypt from "bcrypt";
+import { Task } from "../tasks/task.entity";
 
 @Entity()
-@Unique(['username'])
+@Unique(["username"])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

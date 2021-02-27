@@ -1,14 +1,14 @@
-import { Task } from './task.entity';
-import { EntityRepository, Repository } from 'typeorm';
-import { CreateTaskDTO } from './dto/create-task-dto';
-import { TaskStatus } from './task.model';
-import { GetTasksFitlerDTO } from './dto/get-tasks-filter.dto';
-import { User } from 'src/auth/user.entity';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { Task } from "./task.entity";
+import { EntityRepository, Repository } from "typeorm";
+import { CreateTaskDTO } from "./dto/create-task-dto";
+import { TaskStatus } from "./task.model";
+import { GetTasksFitlerDTO } from "./dto/get-tasks-filter.dto";
+import { User } from "src/auth/user.entity";
+import { InternalServerErrorException, Logger } from "@nestjs/common";
 
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
-  private logger = new Logger('taskRepository');
+  private logger = new Logger("taskRepository");
 
   async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<Task> {
     const task = new Task();
@@ -22,9 +22,9 @@ export class TaskRepository extends Repository<Task> {
     } catch (e) {
       this.logger.error(
         `Failed to get tasks for user "${user.username}", DTO: ${JSON.stringify(
-          createTaskDTO,
+          createTaskDTO
         )}`,
-        e.stack,
+        e.stack
       );
     }
 
@@ -33,26 +33,26 @@ export class TaskRepository extends Repository<Task> {
 
   async getTasks(
     getTasksFilterDTO: GetTasksFitlerDTO,
-    user: User,
+    user: User
   ): Promise<Task[]> {
     const { status, search } = getTasksFilterDTO;
 
-    const query = this.createQueryBuilder('task');
+    const query = this.createQueryBuilder("task");
 
     if (status) {
-      query.andWhere('task.status = :status', { status });
+      query.andWhere("task.status = :status", { status });
     }
 
     if (search) {
       query.andWhere(
-        'task.title LIKE :search OR task.description LIKE :search',
+        "task.title LIKE :search OR task.description LIKE :search",
         {
           search: `%${search}%`,
-        },
+        }
       );
     }
 
-    query.andWhere('task.userId = :userId', { userId: user.id });
+    query.andWhere("task.userId = :userId", { userId: user.id });
 
     try {
       const tasks = await query.getMany();
@@ -60,9 +60,9 @@ export class TaskRepository extends Repository<Task> {
     } catch (e) {
       this.logger.error(
         `Failed to get tasks for user "${user.username}", DTO: ${JSON.stringify(
-          getTasksFilterDTO,
+          getTasksFilterDTO
         )}`,
-        e.stack,
+        e.stack
       );
       throw new InternalServerErrorException();
     }

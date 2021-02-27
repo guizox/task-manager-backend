@@ -1,12 +1,12 @@
-import { User } from 'src/auth/user.entity';
+import { User } from "../auth/user.entity";
 import {
   BaseEntity,
   Column,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { TaskStatus } from './task.model';
+} from "typeorm";
+import { TaskStatus } from "./task.model";
 
 @Entity()
 export class Task extends BaseEntity {
